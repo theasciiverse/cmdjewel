@@ -8,6 +8,14 @@ cmdjewel is a terminal match-3 game inspired by Bejeweled, written with Rust and
 
 # Running
 
+Go to the [latest release](https://github.com/pastthepixels/cmdjewel/releases) and download a build for your system, and then unzip and double-click it. Builds are named after the devices they were built on, so
+
+- cmdjewel-ubuntu-latest.zip is for x86_64 Linux devices
+- cmdjewel-windows-latest.zip is for x85_64 Windows devices
+- cmdjewel-macos-latest.zip is for MacOS devices
+
+# Running (from source)
+
 To run cmdjewel from source, you need to have cargo installed. The recommended way of installing it is through [rustup](https://rustup.rs/).
 
 After cloning cmdjewel, type `cargo run --release` in a terminal. You might need to install some dependencies for cmdjewel's audio library, such as `alsa-lib-devel` on Fedora Linux.
