@@ -128,7 +128,7 @@ pub fn show_troubleshooting(s: &mut Cursive) {
     s.add_layer(
         Dialog::info("")
             .content(ScrollView::new(TextView::new(include_str!(
-                "../../../TROUBLESHOOTING.md"
+                "../../TROUBLESHOOTING.md"
             ))))
             .title(strings::TROUBLESHOOTING.to_lowercase())
             .full_screen(),
