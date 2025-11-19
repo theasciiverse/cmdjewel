@@ -1,7 +1,9 @@
 [package]
 name = "cmdjewel_core"
-version = "0.1.0"
+description = "Standalone game logic for cmdjewel, to be used in match-3 games"
+version = "0.3.0"
 edition = "2024"
+categories = ["game_development", "games"]
 
 [dependencies]
 rand = "0.8.5"
