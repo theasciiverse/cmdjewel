@@ -4,6 +4,7 @@ description = "Standalone game logic for cmdjewel, to be used in match-3 games"
 version = "0.3.0"
 edition = "2024"
 categories = ["game_development", "games"]
+license = "GPL-3.0-only"
 
 [dependencies]
 rand = "0.8.5"
