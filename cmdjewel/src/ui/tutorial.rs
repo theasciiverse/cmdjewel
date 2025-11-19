@@ -127,10 +127,9 @@ pub fn show_tutorial(s: &mut Cursive) {
 pub fn show_troubleshooting(s: &mut Cursive) {
     s.add_layer(
         Dialog::info("")
-            .content(ScrollView::new(TextView::new(include_str!(concat!(
-                env!("CARGO_MANIFEST_DIR"),
-                "/../TROUBLESHOOTING.md"
-            )))))
+            .content(ScrollView::new(TextView::new(include_str!(
+                "../../../TROUBLESHOOTING.md"
+            ))))
             .title(strings::TROUBLESHOOTING.to_lowercase())
             .full_screen(),
     );
