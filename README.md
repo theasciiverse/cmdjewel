@@ -20,6 +20,9 @@ To run cmdjewel from source, you need to have cargo installed. The recommended w
 
 After cloning cmdjewel, type `cargo run --release` in a terminal. You might need to install some dependencies for cmdjewel's audio library, such as `alsa-lib-devel` on Fedora Linux.
 
+> [!NOTE]
+> You can also skip having to clone this repository by installing cmdjewel from crates.io, with `cargo install cmdjewel`. Make sure to install ALSA on Linux systems!
+
 ## Something went wrong and I'm not getting any errors printed!
 Since cmdjewel writes to the terminal, it clears the screen when it terminates. To see warnings and errors, pipe stderr to a file.  
 
