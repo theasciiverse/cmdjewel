@@ -1,7 +1,9 @@
 on: [push]
 jobs:
   build:
-    runs-on: codeberg-medium
+    runs-on: docker
+    container:
+      image: docker.io/rust:latest
     steps:
       - run: |
           cargo build --target=x86_64-pc-windows-gnu
