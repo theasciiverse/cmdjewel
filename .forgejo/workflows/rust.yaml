@@ -14,10 +14,10 @@ jobs:
         run: |
           rustup target add x86_64-pc-windows-gnu
           cargo build --target=x86_64-pc-windows-gnu
-      - name: Build for MacOS (ARM64)
+      - name: Build for MacOS x64
         run: |
-          rustup target add aarch64-apple-darwin
-          cargo build --target=aarch64-apple-darwin
+          rustup target add x86_64-apple-darwin
+          cargo build --target=x86_64-apple-darwin
       - name: Build for Linux x64
         run: |
           rustup target add x86_64-unknown-linux-gnu
