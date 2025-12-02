@@ -5,12 +5,12 @@ jobs:
   build:
     runs-on: codeberg-medium
     container:
-      image: docker.io/rust:latest
+      image: docker.io/rust:trixie
     steps:
       - run: git clone https://codeberg.org/pastthepixels/cmdjewel .
       - name: Build for Windows x64
         run: |
-          sudo apt install mingw-w64 # Have to install MinGW (bleh)
+          apt install mingw-w64 # Have to install MinGW (bleh)
           rustup target add x86_64-pc-windows-gnu
           cargo build --target=x86_64-pc-windows-gnu
       - name: Build for MacOS (ARM64)
