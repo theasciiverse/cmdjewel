@@ -11,27 +11,11 @@ jobs:
       # Need MinGW for Windows, Clang for building it2play, and ALSA for Linux audio...
       - name: Install MinGW and Clang and ALSA
         run: apt update && apt install g++-mingw-w64-x86-64 clang libasound2-dev -y
-      # This part is going to *suck*. I took it from a blog post. I hope it works.
-      - name: Set up cross-compiling for MacOS
-        run: |
-          rustup target add aarch64-apple-darwin
-          git clone https://github.com/tpoechtrager/osxcross
-          cd osxcross
-          wget -nc https://s3.dockerproject.org/darwin/v2/MacOSX10.10.sdk.tar.xz
-          mv MacOSX10.10.sdk.tar.xz tarballs/
-          UNATTENDED=yes OSX_VERSION_MIN=10.7 ./build.sh
-          cd ..
-          # config....
-          mkdir -p ~/.cargo
-          echo "[target.aarch64-apple-darwin]\nlinker = \"aarch64-apple-darwin14-clang\"\nar = \"aarch64-apple-darwin14-ar\"" > ~/.cargo/config
       # Finally we can start building!!
       - name: Build for Windows x64
         run: |
           rustup target add x86_64-pc-windows-gnu
           cargo build --target=x86_64-pc-windows-gnu --release
-      - name: Build for MacOS x64
-        run: |
-          PATH="$(pwd)/osxcross/target/bin:$PATH" CC=o64-clang cargo build --target=aarch64-apple-darwin --release
       - name: Build for Linux x64
         run: |
           rustup target add x86_64-unknown-linux-gnu
@@ -41,13 +25,29 @@ jobs:
         run: apt install nodejs -y
       - uses: actions/upload-artifact@v3
         with:
-          name: cmdjewel-windows-x64
+          name: build_x86-pc-windows-gnu
           path: target/x86_64-pc-windows-gnu/release/cmdjewel.exe
       - uses: actions/upload-artifact@v3
         with:
-          name: build-macos
-          path: target/x86_64-apple-darwin/release/cmdjewel
-      - uses: actions/upload-artifact@v3
-        with:
-          name: cmdjewel-linux-x64
+          name: cmdjewel_x86_64-unknown-linux-gnu
           path: target/x86_64-unknown-linux-gnu/release/cmdjewel
+
+    # Well, now we have to build cmdjewel for MacOS. Strap tight. This is going to be hard.
+    build-macos:
+      runs-on: codeberg-medium
+      container:
+        image: multiarch/crossbuild:latest
+      steps:
+        # Install deps
+        - name: Install Rust
+          run: |
+            apt update && apt install rustup -y
+            rustup default stable
+            rustup target add aarch64-apple-darwin
+        - name: Build for MacOS aarch64
+          run: cargo build --target=aarch64-apple-darwin --release
+        # Upload
+        - uses: actions/upload-artifact@v3
+          with:
+            name: build-macos
+            path: target/aarch64-apple-darwin/release/cmdjewel
