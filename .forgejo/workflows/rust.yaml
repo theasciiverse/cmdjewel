@@ -8,8 +8,8 @@ jobs:
       image: docker.io/rust:latest
     steps:
       - run: git clone https://codeberg.org/pastthepixels/cmdjewel .
-      - name: Install MinGW and Clang
-        run: apt update && apt install g++-mingw-w64-x86-64 clang -y
+      - name: Install MinGW and Clang and ALSA
+        run: apt update && apt install g++-mingw-w64-x86-64 clang alsa-lib -y
       - name: Build for Windows x64
         run: |
           rustup target add x86_64-pc-windows-gnu
