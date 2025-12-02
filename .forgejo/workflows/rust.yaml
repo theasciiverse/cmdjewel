@@ -1,6 +1,6 @@
 name: Build
 
-on: [push]
+on: [release]
 jobs:
   build:
     runs-on: codeberg-medium
@@ -33,21 +33,21 @@ jobs:
           path: target/x86_64-unknown-linux-gnu/release/cmdjewel
 
   # Well, now we have to build cmdjewel for MacOS. Strap tight. This is going to be hard.
-  build-macos:
-    runs-on: codeberg-medium
-    container:
-      image: docker.io/multiarch/crossbuild:latest
-    steps:
-      # Install deps
-      - name: Install Rust
-        run: |
-          apt update && apt install rustup nodejs -y
-          rustup default stable
-          rustup target add aarch64-apple-darwin
-      - name: Build for MacOS aarch64
-        run: cargo build --target=aarch64-apple-darwin --release
-      # Upload
-      - uses: actions/upload-artifact@v3
-        with:
-          name: build-macos
-          path: target/aarch64-apple-darwin/release/cmdjewel
+  # build-macos:
+  #   runs-on: codeberg-medium
+  #   container:
+  #     image: docker.io/multiarch/crossbuild:latest
+  #   steps:
+  #     # Install deps
+  #     - name: Install Rust
+  #       run: |
+  #         apt update && apt install rustup nodejs -y
+  #         rustup default stable
+  #         rustup target add aarch64-apple-darwin
+  #     - name: Build for MacOS aarch64
+  #       run: cargo build --target=aarch64-apple-darwin --release
+  #     # Upload
+  #     - uses: actions/upload-artifact@v3
+  #       with:
+  #         name: build-macos
+  #         path: target/aarch64-apple-darwin/release/cmdjewel
