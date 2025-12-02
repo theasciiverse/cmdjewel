@@ -8,7 +8,15 @@ jobs:
       image: docker.io/rust:latest
     steps:
       - run: git clone https://codeberg.org/pastthepixels/cmdjewel .
-      - run: |
+      - name: Build for Windows x64
+        run: |
+          rustup target add x86_64-pc-windows-gnu
           cargo build --target=x86_64-pc-windows-gnu
+      - name: Build for MacOS (ARM64)
+        run: |
+          rustup target add aarch64-apple-darwin
           cargo build --target=aarch64-apple-darwin
+      - name: Build for Linux x64
+        run: |
+          rustup target add x86_64-unknown-linux-gnu
           cargo build --target=x86_64-unknown-linux-gnu
