@@ -155,6 +155,7 @@ pub fn show_settings(s: &mut Cursive) {
         let mut cfg = config::load_config();
         cfg.settings.music_vol = v as f32 / 24.; // TODO 24 is a constant; 25 - 1
         config::save_config(&cfg);
+        #[cfg(feature = "sound")]
         it2play_rs::set_global_volume((cfg.settings.music_vol * 128.) as u16);
     });
     s.add_layer(
@@ -292,6 +293,7 @@ fn switch_screen<T: View>(s: &mut Cursive, view: T, soundtrack: u16) {
             });
             // Fade out volume.
             vol_m -= vol / max_ticks as u16;
+            #[cfg(feature = "sound")]
             it2play_rs::set_global_volume(vol_m);
             // Increase ticks
             ticks += 1;
@@ -310,7 +312,9 @@ fn switch_screen<T: View>(s: &mut Cursive, view: T, soundtrack: u16) {
                     t.palette = palette.clone();
                 });
                 // Play music
+                #[cfg(feature = "sound")]
                 it2play_rs::play(soundtrack);
+                #[cfg(feature = "sound")]
                 it2play_rs::set_global_volume(vol);
             }
         });

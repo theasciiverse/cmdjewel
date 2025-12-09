@@ -4,7 +4,6 @@ mod constants;
 mod ui;
 mod view;
 
-use cpal::traits::StreamTrait;
 use cursive::{
     theme::{Color, ColorStyle},
     traits::With,
@@ -36,14 +35,15 @@ fn main() {
     // as a command to change the background.
     println!("\x1b]11;#2E3440\x07");
     // Set up music
-    it2play_rs::load_bytes(
-        Vec::from(include_bytes!("../cmdjewel.it")),
-        it2play_rs::IT2Driver::HQ,
-    );
-    let stream = it2play_rs::generate_stream();
-    stream.play().unwrap();
-    it2play_rs::play(0);
-    it2play_rs::set_global_volume((config::load_config().settings.music_vol * 128.) as u16);
+    #[cfg(feature = "sound")]
+    let stream;
+    #[cfg(feature = "sound")]
+    {
+        use cpal::traits::StreamTrait;
+        stream = init_audio();
+        stream.play().unwrap();
+    }
+
     // Set title
     siv.set_window_title("cmdjewel");
     // show the start screen
@@ -56,4 +56,14 @@ fn main() {
     // Cleaning up: Reset the background (again on terminals that support it)
     // Konsole (KDE) doesn't support this, but Alacritty and XTerm do. You might find it's a hit-or-miss with your terminal.
     println!("\x1b]111;\x07")
+}
+
+#[cfg(feature = "sound")]
+fn init_audio() -> cpal::Stream {
+    it2play_rs::load_bytes(
+        Vec::from(include_bytes!("../cmdjewel.it")),
+        it2play_rs::IT2Driver::HQ,
+    );
+    it2play_rs::play(0);
+    return it2play_rs::generate_stream();
 }
