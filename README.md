@@ -23,6 +23,10 @@ After cloning cmdjewel, type `cargo run --release` in a terminal. You might need
 > [!NOTE]
 > You can also skip having to clone this repository by installing cmdjewel from crates.io, with `cargo install cmdjewel`. Make sure to install ALSA on Linux systems!
 
+> [!NOTE]
+> What if you want to compile cmdjewel without any sound libraries? (Like with Termux on Android, which is... a pain.)  
+> You can use `cargo run --release --no-default-flags`. This works because cmdjewel has one feature flag -- `sound` -- enabled by default (which you can turn off!)
+
 ## Something went wrong and I'm not getting any errors printed!
 Since cmdjewel writes to the terminal, it clears the screen when it terminates. To see warnings and errors, pipe stderr to a file.  
 
