@@ -1,7 +1,7 @@
 ![cmdjewel](assets/images/logo.svg)
 ========
 
-[cmdjewel.webm](https://github.com/user-attachments/assets/69ca8994-b557-4e74-9639-5edbd72ed42e)
+[![asciicast](https://asciinema.org/a/760209.svg)](https://asciinema.org/a/760209)
 
 
 cmdjewel is a terminal match-3 game inspired by Bejeweled, written with Rust and cursive.
@@ -26,9 +26,6 @@ You can install cmdjewel from the AUR with `cmdjewel-git`, which installs it glo
 To run cmdjewel from source, you need to have cargo installed. The recommended way of installing it is through [rustup](https://rustup.rs/).
 
 After cloning cmdjewel, type `cargo run --release` in a terminal. You might need to install some dependencies for cmdjewel's audio library, such as `alsa-lib-devel` on Fedora Linux.
-
-> [!NOTE]
-> You can also skip having to clone this repository by installing cmdjewel from crates.io, with `cargo install cmdjewel`. Make sure to install ALSA on Linux systems!
 
 > [!NOTE]
 > What if you want to compile cmdjewel without any sound libraries? (Like with Termux on Android, which is... a pain.)  
