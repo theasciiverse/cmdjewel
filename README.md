@@ -45,22 +45,3 @@ cmdjewel uses a modal control system. To navigate in SELECT mode, use the arrow 
 one using the arrow keys. Alternatively you can use Vim keybinds (h, j, k, l) by default.
 
 If you notice everything's too small, try changing your terminal's font size. The game is designed to run at any font size (as long as everything fits!)
-
-# TODO:
-- [x] MacOS export
-- [x] Music/SFX slider
-- [x] Settings page accessible in-game/main menu
-- [X] Saving/loading from config files (TOML probably somewhere in ~/.config)
-- [X] Better title screen logo
-- [x] Animation from moving from the title screen to main menu
-- [X] Main menu resembling Bejeweled 3
-- [x] Hypercube with hypercube matching
-- [ ] Sound effects
-- [-] Music rewrite (in progress)
-- [x] Special gems that explode hypercubes activate those hypercubes
-- [x] Star gems
-- [ ] Supernova gems
-- [x] Help screens
-  - [x] Gameplay tutorial
-  - [x] Troubleshooting
-  - [x] Controls
