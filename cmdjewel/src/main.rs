@@ -9,14 +9,14 @@ use cursive::{theme::ColorStyle, traits::With};
 fn main() {
     let mut siv = cursive::default();
     // Set a theme (nord) (I copy and pasted this from the git repo and changed some colors)
+    let theme = config::get_config().settings.theme.unwrap_or_default();
     siv.set_theme(cursive::theme::Theme {
         shadow: false,
         borders: cursive::theme::BorderStyle::Simple,
         palette: cursive::theme::Palette::retro().with(|palette| {
             use cursive::style::PaletteColor::*;
-            let theme = config::get_config().settings.theme.unwrap_or_default();
             palette[Background] = theme.background.clone().into();
-            palette[View] = theme.background.into();
+            palette[View] = theme.background.clone().into();
             palette[Primary] = theme.foreground.into();
             palette[HighlightText] = theme.highlight_text.into();
             palette[TitlePrimary] = theme.title_primary.into();
@@ -30,8 +30,11 @@ fn main() {
     // Sets the terminal background--uses an ANSI escape sequence to run an Operating System Command (OSC)
     // that gets picked up by your terminal emulator. XTerm (and other emulators) implemented this
     // as a command to change the background.
-    println!("\x1b]11;#2E3440\x07"); // TODO
-                                     // Set up music
+    println!(
+        "\x1b]11;#{:02x}{:02x}{:02x}\x07",
+        theme.background.0, theme.background.1, theme.background.2
+    );
+    // Set up music
     #[cfg(feature = "sound")]
     let stream;
     #[cfg(feature = "sound")]

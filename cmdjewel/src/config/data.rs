@@ -1,8 +1,13 @@
+use std::fmt;
+
 use cmdjewel_core::{
     board::Board,
     gems::{Gem, GemColor, GemSelector},
 };
-use serde::{Deserialize, Serialize};
+use serde::{
+    de::{self, Visitor},
+    Deserialize, Serialize, Serializer,
+};
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Config {
@@ -45,12 +50,57 @@ pub struct Theme {
 }
 
 /// Theme colours
-#[derive(Serialize, Deserialize, Clone)]
-pub struct Color(u8, u8, u8);
+#[derive(Clone)]
+pub struct Color(pub u8, pub u8, pub u8);
 
 impl Into<cursive::theme::Color> for Color {
     fn into(self) -> cursive::theme::Color {
         cursive::theme::Color::Rgb(self.0, self.1, self.2)
+    }
+}
+
+struct ColorVisitor;
+
+impl<'de> Visitor<'de> for ColorVisitor {
+    type Value = Color;
+
+    fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+        formatter.write_str("a hexadecimal color string with the format #RRGGBB")
+    }
+
+    fn visit_str<E>(self, value: &str) -> Result<Self::Value, E>
+    where
+        E: de::Error,
+    {
+        let r = u8::from_str_radix(&value[1..3], 16);
+        let g = u8::from_str_radix(&value[3..5], 16);
+        let b = u8::from_str_radix(&value[5..7], 16);
+        if r.is_err() || g.is_err() || b.is_err() {
+            Err(E::custom(format!(
+                "String '{}' not valid #RRGGBB color string",
+                value
+            )))
+        } else {
+            Ok(Color(r.unwrap(), g.unwrap(), b.unwrap()))
+        }
+    }
+}
+
+impl<'de> Deserialize<'de> for Color {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        deserializer.deserialize_str(ColorVisitor)
+    }
+}
+
+impl Serialize for Color {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        serializer.serialize_str(&format!("#{:02x}{:02x}{:02x}", self.0, self.1, self.2))
     }
 }
 
