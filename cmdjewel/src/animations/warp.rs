@@ -15,7 +15,7 @@ pub struct Warp {
 impl Warp {
     /// Creates a new explosion animation.
     /// Requires the number of gems on a board, and the force of the explosion.
-    pub fn new(num_gems: usize, force: f32) -> Self {
+    pub fn new(num_gems: usize) -> Self {
         Warp {
             keyframe: 0,
             positions: Self::calculate_positions(num_gems),

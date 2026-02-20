@@ -148,11 +148,11 @@ pub fn show_game(s: &mut Cursive, config: BoardConfig) {
 
 /// Shows the settings dialog.
 pub fn show_settings(s: &mut Cursive) {
-    let settings = config::load_config().settings;
+    let settings = config::get_config().settings;
     let mut slider = SliderView::horizontal(25); // TODO 25 is a constant
     slider.set_value((settings.music_vol * (slider.get_max_value() - 1) as f32) as usize);
     slider.set_on_change(|_, v| {
-        let mut cfg = config::load_config();
+        let mut cfg = config::get_config();
         cfg.settings.music_vol = v as f32 / 24.; // TODO 24 is a constant; 25 - 1
         config::save_config(&cfg);
         #[cfg(feature = "sound")]
@@ -262,7 +262,7 @@ pub fn init_commands(s: &mut Cursive) {
 /// We'll use the name "_screen" to denote one of these screens. I'm hesitant to use "scene" as terminology here since we're working with an immediate mode GUI instead of a scene structure like Godot or Unity.
 fn switch_screen<T: View>(s: &mut Cursive, view: T, soundtrack: u16) {
     // Switch module order for the screen
-    let vol = (config::load_config().settings.music_vol * 128.) as u16;
+    let vol = (config::get_config().settings.music_vol * 128.) as u16;
     let mut vol_m = vol;
     // Play an animation! If applicable.
     if let Some(layer_position) = s.screen_mut().find_layer_from_name("_screen") {

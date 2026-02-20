@@ -4,7 +4,7 @@ use toml_edit::{Item, KeyMut, Value};
 pub struct HackyFormatter;
 
 impl VisitMut for HackyFormatter {
-    fn visit_table_like_kv_mut(&mut self, mut key: KeyMut<'_>, node: &mut Item) {
+    fn visit_table_like_kv_mut(&mut self, key: KeyMut<'_>, node: &mut Item) {
         // Convert inline tables to tables.
         // By default, toml_edit serializes all tables as inline (and arrays of tables as... an array of inline tables.)
         if let Item::Value(Value::InlineTable(table)) = node {

@@ -424,7 +424,7 @@ impl cursive::view::View for BoardView {
                             .unwrap();
                         s.screen_mut().add_fullscreen_layer(
                             AnimationView::new(
-                                crate::animations::warp::Warp::new(data.len(), 1.0),
+                                crate::animations::warp::Warp::new(data.len()),
                                 data,
                             )
                             .full_screen(),

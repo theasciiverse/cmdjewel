@@ -4,10 +4,7 @@ mod constants;
 mod ui;
 mod view;
 
-use cursive::{
-    theme::{Color, ColorStyle},
-    traits::With,
-};
+use cursive::{theme::ColorStyle, traits::With};
 
 fn main() {
     let mut siv = cursive::default();
@@ -17,24 +14,24 @@ fn main() {
         borders: cursive::theme::BorderStyle::Simple,
         palette: cursive::theme::Palette::retro().with(|palette| {
             use cursive::style::PaletteColor::*;
-
-            palette[Background] = Color::Rgb(46, 52, 64);
-            palette[View] = Color::Rgb(46, 52, 64);
-            palette[Primary] = Color::Rgb(213, 219, 230);
-            palette[HighlightText] = Color::Rgb(213, 219, 230);
-            palette[TitlePrimary] = Color::Rgb(126, 158, 189);
-            palette[Secondary] = Color::Rgb(76, 86, 106);
-            palette[Tertiary] = Color::Rgb(59, 66, 82);
-            palette[Highlight] = Color::Rgb(190, 96, 105);
-            palette[HighlightInactive] = Color::Rgb(126, 158, 189);
+            let theme = config::get_config().settings.theme.unwrap_or_default();
+            palette[Background] = theme.background.clone().into();
+            palette[View] = theme.background.into();
+            palette[Primary] = theme.foreground.into();
+            palette[HighlightText] = theme.highlight_text.into();
+            palette[TitlePrimary] = theme.title_primary.into();
+            palette[Secondary] = theme.inactive_fg.into();
+            palette[Tertiary] = theme.inactive_bg.into();
+            palette[Highlight] = theme.highlight.into();
+            palette[HighlightInactive] = theme.highlight_inactive.into();
             palette[cursive::style::PaletteStyle::EditableText].color = ColorStyle::primary();
         }),
     });
     // Sets the terminal background--uses an ANSI escape sequence to run an Operating System Command (OSC)
     // that gets picked up by your terminal emulator. XTerm (and other emulators) implemented this
     // as a command to change the background.
-    println!("\x1b]11;#2E3440\x07");
-    // Set up music
+    println!("\x1b]11;#2E3440\x07"); // TODO
+                                     // Set up music
     #[cfg(feature = "sound")]
     let stream;
     #[cfg(feature = "sound")]

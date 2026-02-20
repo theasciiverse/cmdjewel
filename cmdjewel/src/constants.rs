@@ -67,6 +67,8 @@ pub mod gems {
     use cmdjewel_core::gems::{Gem, GemColor};
     use cursive::style::{Color, ColorStyle};
 
+    use crate::config;
+
     /// Gets a printable string from a game::Gems.
     /// This doesn't belong in board as that file only contains game logic and nothing user-facing.
     pub fn gem_string(gem: Gem) -> String {
@@ -99,26 +101,35 @@ pub mod gems {
 
     /// Gets a ColorStyle given a game::Gems
     pub fn gem_color(gem: Gem) -> ColorStyle {
+        let theme = config::get_config().settings.theme.unwrap_or_default();
         match gem {
-            Gem::Empty => ColorStyle::new(Color::Rgb(67, 76, 94), Color::Rgb(46, 52, 64)),
+            Gem::Empty => ColorStyle::new(
+                Into::<Color>::into(theme.grey),
+                Into::<Color>::into(theme.background),
+            ),
             Gem::Normal(x) => colorstyle_from_gemcolor(x),
             Gem::Flame(x) => colorstyle_from_gemcolor(x),
             Gem::Star(x) => colorstyle_from_gemcolor(x),
             Gem::Supernova(x) => colorstyle_from_gemcolor(x),
-            Gem::Hypercube(_) => ColorStyle::new(Color::Rgb(213, 219, 230), Color::Rgb(67, 76, 94)),
+            Gem::Hypercube(_) => ColorStyle::new(
+                Into::<Color>::into(theme.highlight_text),
+                Into::<Color>::into(theme.grey),
+            ),
         }
     }
 
     /// Returns a ColorStyle from a game::GemColor
     fn colorstyle_from_gemcolor(gem_color: GemColor) -> ColorStyle {
+        let theme = config::get_config().settings.theme.unwrap_or_default();
+        let background = Into::<Color>::into(theme.background);
         match gem_color {
-            GemColor::Blue => ColorStyle::new(Color::Rgb(126, 158, 189), Color::Rgb(46, 52, 64)),
-            GemColor::White => ColorStyle::new(Color::Rgb(213, 219, 230), Color::Rgb(46, 52, 64)),
-            GemColor::Red => ColorStyle::new(Color::Rgb(190, 96, 105), Color::Rgb(46, 52, 64)),
-            GemColor::Yellow => ColorStyle::new(Color::Rgb(233, 201, 138), Color::Rgb(46, 52, 64)),
-            GemColor::Green => ColorStyle::new(Color::Rgb(162, 188, 139), Color::Rgb(46, 52, 64)),
-            GemColor::Orange => ColorStyle::new(Color::Rgb(207, 135, 111), Color::Rgb(46, 52, 64)),
-            GemColor::Purple => ColorStyle::new(Color::Rgb(174, 174, 255), Color::Rgb(46, 52, 64)),
+            GemColor::Blue => ColorStyle::new(Into::<Color>::into(theme.blue), background),
+            GemColor::White => ColorStyle::new(Into::<Color>::into(theme.foreground), background),
+            GemColor::Red => ColorStyle::new(Into::<Color>::into(theme.red), background),
+            GemColor::Yellow => ColorStyle::new(Into::<Color>::into(theme.yellow), background),
+            GemColor::Green => ColorStyle::new(Into::<Color>::into(theme.green), background),
+            GemColor::Orange => ColorStyle::new(Into::<Color>::into(theme.orange), background),
+            GemColor::Purple => ColorStyle::new(Into::<Color>::into(theme.purple), background),
         }
     }
 }
