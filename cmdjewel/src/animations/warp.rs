@@ -97,7 +97,7 @@ impl Animation for Warp {
             .iter_mut()
             .map(|circle| (circle.0 + 1, circle.1))
             .collect();
-        if self.keyframe % 15 == 0 && (self.get_max_keyframe() - self.keyframe) > WARP_KEYFRAMES {
+        if self.keyframe.is_multiple_of(15) && (self.get_max_keyframe() - self.keyframe) > WARP_KEYFRAMES {
             let mut rng = rand::rng();
             let color = match rng.random_range(0..8) {
                 1 => Color::Rgb(126, 158, 189),

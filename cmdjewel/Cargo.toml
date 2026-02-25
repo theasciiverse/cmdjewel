@@ -2,7 +2,7 @@
 name = "cmdjewel"
 description = "A match-3 game that runs in your terminal."
 version = "0.3.0"
-edition = "2021"
+edition = "2024"
 keywords = ["bejeweled_clone", "match_3"]
 categories = ["games"]
 readme = "../README.md"

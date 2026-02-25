@@ -50,9 +50,28 @@ pub mod strings {
     pub const WARN_RESET: &str =
         "This will delete your config file, including all your saved games.";
     pub const ARE_SURE: &str = "Are you sure?";
+    pub const GOODBYE: [&str; 10] = [
+        "Goodbye!",
+        "Thanks for playing cmdjewel!",
+        "See you again soon!",
+        "Thanks for all your support <3",
+        "Aw man, you quit *this* early?",
+        "[INSERT WITTY GOODBYE ONE-LINER.]",
+        "Bye for now! Maybe you should mess with your save file in ~/.config/cmdjewel/. I mean what? I didn't say anything.",
+        "Seeya round!",
+        "▼ Goodby--Aw whups I dropped this gem...",
+        "Stick around for Bejeweled 4, coming in the year 3000! Now with gambling and in-app purchases!",
+    ];
+    pub const CRASH: &str = "Oh dear! cmdjewel crashed! Look at the error to get some clues, or open a bug at https://codeberg.org/pastthepixels/cmdjewel/issues";
+
+    // Errors :(
+    pub const ERR_PARSE_CONFIG: &str = "[ERROR] Unable to parse config file!";
 
     pub fn first_save(path: &str) -> String {
-        format!("cmdjewel just created a save file at {}. When you return, it'll load your game from that path.", path)
+        format!(
+            "cmdjewel just created a save file at {}. When you return, it'll load your game from that path.",
+            path
+        )
     }
 
     pub fn game_over(score: u32, level: u8) -> String {

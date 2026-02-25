@@ -58,8 +58,8 @@ pub fn show_menu_main(s: &mut Cursive) {
             .child(
                 Dialog::around(buttons)
                     .title(strings::MAIN_MENU.to_lowercase())
-                    .button(strings::HELP, |s| tutorial::show_help(s))
-                    .button(strings::SETTINGS, |s| show_settings(s))
+                    .button(strings::HELP, tutorial::show_help)
+                    .button(strings::SETTINGS, show_settings)
                     .button(strings::QUIT, |s| s.quit())
                     .padding(Margins::lrtb(0, 0, 1, 0)),
             )

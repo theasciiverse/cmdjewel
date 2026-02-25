@@ -99,13 +99,10 @@ impl BoardView {
         self.animations.iter_mut().for_each(|animation| {
             if animation.wait == 0 {
                 // Animation logic
-                match animation.animation_type {
-                    AnimationType::Blink(s) => {
-                        if animation.duration % 2 == 0 {
-                            animation.animation_type = AnimationType::Blink(!s)
-                        }
+                if let AnimationType::Blink(s) = animation.animation_type {
+                    if animation.duration % 2 == 0 {
+                        animation.animation_type = AnimationType::Blink(!s)
                     }
-                    _ => (),
                 }
                 // Count down all animations
                 if animation.duration != 0 {
@@ -137,7 +134,7 @@ impl BoardView {
                     });
                 }
                 m.gems.iter().for_each(|&p| {
-                    if let Gem::Normal(_) = v.board.get_gem(p.clone()) {
+                    if let Gem::Normal(_) = v.board.get_gem(p) {
                         // Highlight normal gems
                         v.animations.push(AnimationDetails {
                             point: p,
@@ -411,7 +408,7 @@ impl cursive::view::View for BoardView {
                             .with_on_finish(move |s| {
                                 s.add_layer(
                                     Dialog::text(strings::game_over(score, level))
-                                        .button(strings::OK, |s| ui::show_menu_main(s)),
+                                        .button(strings::OK, ui::show_menu_main),
                                 );
                             })
                             .full_screen(),

@@ -4,11 +4,12 @@ use cmdjewel_core::gems::Gem;
 use std::fs::File;
 use std::io::Read;
 use std::path::PathBuf;
-use std::sync::atomic::AtomicBool;
 use std::sync::RwLock;
+use std::sync::atomic::AtomicBool;
 use toml_edit::visit_mut::VisitMut;
 
 pub mod data;
+pub mod data_theme;
 mod hacks;
 
 static CONFIG_MODIFIED: AtomicBool = AtomicBool::new(false);
@@ -35,7 +36,10 @@ pub fn get_config() -> data::Config {
             file.unwrap().read_to_string(&mut data).unwrap();
             // Reads the config file, returns data::Config::default() if it can't deserialize
             // TODO made an edit here; maybe we should crash instead lol
-            let config = toml::from_str::<data::Config>(&data).unwrap(); //_or(data::Config::default());
+            let config = match toml::from_str::<data::Config>(&data) {
+                Ok(res) => res,
+                Err(err) => panic!("{} {}", constants::strings::ERR_PARSE_CONFIG, err.message()),
+            };
             *CONFIG.write().unwrap() = Some(config.clone()); // <- Update cached config
             CONFIG_MODIFIED.store(true, std::sync::atomic::Ordering::Relaxed); // <- Reset modified check; we cached a new config
             config
@@ -51,11 +55,7 @@ pub fn get_config() -> data::Config {
 
 /// Returns the full path of a config file
 pub fn config_path() -> Option<PathBuf> {
-    if let Some(dir) = dirs::config_local_dir() {
-        Some(dir.join(constants::CONFIG_PATH))
-    } else {
-        None
-    }
+    dirs::config_local_dir().map(|dir| dir.join(constants::CONFIG_PATH))
 }
 
 /// Saves a board to an existing Save. Requires get_save() to return a valid save
@@ -65,7 +65,7 @@ pub fn save_board(board: &Board, is_game_over: bool) {
     let mut cfg = get_config();
     // Create a game save from the board
     let gs = if !is_game_over {
-        Some(data::GameSave::new(&board))
+        Some(data::GameSave::new(board))
     } else {
         None
     };
@@ -120,7 +120,7 @@ pub fn new_board(config: BoardConfig) -> Board {
         // TODO: wow this code sucks
         let mut data = [Gem::Empty; 64];
         let save_data = save.data.iter().map(|g| g.0).collect::<Vec<Gem>>();
-        data.copy_from_slice(&save_data.as_slice());
+        data.copy_from_slice(save_data.as_slice());
         Board::new_controlled(config, data, save.score, save.level, save.level_progress)
     } else {
         Board::new(config)

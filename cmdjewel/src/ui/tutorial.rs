@@ -23,8 +23,8 @@ pub fn show_help(s: &mut Cursive) {
                     .child(vspacer!())
                     .child(TextView::new(strings::HELP_TUTORIAL)),
             )
-            .button(strings::TUTORIAL, |s| show_tutorial(s))
-            .button(strings::TROUBLESHOOTING, |s| show_troubleshooting(s))
+            .button(strings::TUTORIAL, show_tutorial)
+            .button(strings::TROUBLESHOOTING, show_troubleshooting)
             .button(strings::OK, |s| {
                 s.pop_layer();
             })
@@ -147,5 +147,5 @@ fn board(b: Vec<[Gem; 3]>) -> PaddedView<ResizedView<Panel<LinearLayout>>> {
         });
         layout.add_child(h);
     });
-    return PaddedView::lrtb(1, 0, 1, 7 - size.1, Panel::new(layout).max_size(size));
+    PaddedView::lrtb(1, 0, 1, 7 - size.1, Panel::new(layout).max_size(size))
 }
