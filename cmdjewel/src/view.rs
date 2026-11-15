@@ -37,6 +37,7 @@ pub struct BoardView {
     pub cursor_mode: CursorMode,
     pub autoplay: bool,
     pub animations_enabled: bool,
+    last_snapshot: Option<std::time::Instant>,
 }
 
 impl BoardView {
@@ -49,6 +50,7 @@ impl BoardView {
             autoplay: false,
             animations_enabled: true,
             cursor_down: Point(0, 0),
+            last_snapshot: None,
         }
     }
 
@@ -186,6 +188,33 @@ impl BoardView {
             self.attempt_swap(point::Direction::Up);
             self.attempt_swap(point::Direction::Down);
         }
+    }
+
+    /// Session log: a snapshot of the game about once a second.
+    fn log_snapshot(&mut self, score: u32, level: u8, progress: f32, is_valid: bool) {
+        if !log::log_enabled!(log::Level::Debug) {
+            return;
+        }
+        let now = std::time::Instant::now();
+        if self.last_snapshot.is_some_and(|t| now.duration_since(t).as_millis() < 1000) {
+            return;
+        }
+        self.last_snapshot = Some(now);
+        let cursor = self.board.get_cursor();
+        log::debug!(
+            "snapshot: mode {} score {} level {} progress {:.0}% cursor ({}, {}) {} focus {} animations {} full {} valid {}",
+            self.board.config_ref().name,
+            score,
+            level,
+            progress,
+            cursor.0,
+            cursor.1,
+            self.cursor_mode,
+            self.has_focus,
+            self.animations.len(),
+            self.board.is_full(),
+            is_valid
+        );
     }
 
     /// Moves the cursor by 1 in any direction and returns an EventResult.
@@ -371,6 +400,7 @@ impl cursive::view::View for BoardView {
                 let score = self.board.get_score();
                 let level = self.board.get_level() + 1;
                 let progress = self.board.get_level_progress() * 100.;
+                self.log_snapshot(score, level, progress, is_valid);
                 // Hacks initial_level if there is a warp animation
                 if self
                     .animations
@@ -400,6 +430,7 @@ impl cursive::view::View for BoardView {
                                 b.board.as_ref().to_vec() // Return board as vec
                             })
                             .unwrap();
+                        log::info!("game over: score {} level {}", score, level);
                         s.screen_mut().add_fullscreen_layer(
                             AnimationView::new(
                                 crate::animations::explosion::Explosion::new(data.len(), 1.0),
@@ -416,6 +447,7 @@ impl cursive::view::View for BoardView {
                     }
                     // Warps if available
                     if initial_level != level {
+                        log::info!("level up: level {}", level);
                         let data = s
                             .call_on_name("board", |b: &mut BoardView| b.board.as_ref().to_vec())
                             .unwrap();

@@ -21,6 +21,7 @@ pub mod tutorial;
 /// Shows the main menu, where gamemodes can be selected.
 /// It's a remake of a combination of Bejeweled 3's "Play" screen and its gamemode selector.
 pub fn show_menu_main(s: &mut Cursive) {
+    log::info!("screen: main menu");
     // If a game exists, save it
     let mut save_path = None;
     if let Some(p) = config::config_path() {
@@ -73,7 +74,7 @@ pub fn show_menu_main(s: &mut Cursive) {
                 )
                 .min_height(3),
             ))
-            .max_width(40),
+            .max_width(41), // the logo is 41 columns wide
         0x02,
     );
     // Show info dialog if the game is being saved for the first time
@@ -85,6 +86,7 @@ pub fn show_menu_main(s: &mut Cursive) {
 /// Shows the start menu, or splash screen.
 /// This is a remake of a combination of Bejeweled 3's loading screen and its "Play" screen.
 pub fn show_menu_splash(s: &mut Cursive) {
+    log::info!("screen: splash");
     switch_screen(
         s,
         LinearLayout::vertical()
@@ -99,6 +101,7 @@ pub fn show_menu_splash(s: &mut Cursive) {
 /// This starts the game given a BoardConfig (which decides game factors such as if it is in classic/zen mode)
 pub fn show_game(s: &mut Cursive, config: BoardConfig) {
     let name = config.name.clone();
+    log::info!("screen: game, mode {}", name);
     let soundtrack = if config.infinite { 0x4b } else { 0x0d };
     // Creates the layout for the dialog
     let layout = LinearLayout::vertical()
@@ -148,12 +151,14 @@ pub fn show_game(s: &mut Cursive, config: BoardConfig) {
 
 /// Shows the settings dialog.
 pub fn show_settings(s: &mut Cursive) {
+    log::info!("screen: settings");
     let settings = config::get_config().settings;
     let mut slider = SliderView::horizontal(25); // TODO 25 is a constant
     slider.set_value((settings.music_vol * (slider.get_max_value() - 1) as f32) as usize);
     slider.set_on_change(|_, v| {
         let mut cfg = config::get_config();
         cfg.settings.music_vol = v as f32 / 24.; // TODO 24 is a constant; 25 - 1
+        log::info!("music volume {}", cfg.settings.music_vol);
         config::save_config(&cfg);
         #[cfg(feature = "sound")]
         it2play_rs::set_global_volume((cfg.settings.music_vol * 128.) as u16);
@@ -188,6 +193,7 @@ pub fn init_commands(s: &mut Cursive) {
         let mut edit_view = EditView::new().on_submit(|s: &mut Cursive, command: &str| {
             // Be generous and trim/lowercase commands
             let command = command.trim().to_lowercase();
+            log::info!("command {:?}", command);
             s.pop_layer();
             // Animation debugging
             if command == "explode" {
@@ -263,6 +269,7 @@ pub fn init_commands(s: &mut Cursive) {
 fn switch_screen<T: View>(s: &mut Cursive, view: T, soundtrack: u16) {
     // Switch module order for the screen
     let vol = (config::get_config().settings.music_vol * 128.) as u16;
+    log::debug!("switch screen, soundtrack order {:#04x}, volume {}", soundtrack, vol);
     let mut vol_m = vol;
     // Play an animation! If applicable.
     if let Some(layer_position) = s.screen_mut().find_layer_from_name("_screen") {

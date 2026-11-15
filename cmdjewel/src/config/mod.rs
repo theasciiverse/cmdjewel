@@ -26,7 +26,7 @@ pub fn get_config() -> data::Config {
         && !CONFIG_MODIFIED.load(std::sync::atomic::Ordering::Relaxed)
     {
         CONFIG.read().unwrap().clone().unwrap()
-    } else if let Some(dir) = dirs::config_local_dir() {
+    } else if let Some(dir) = state_dir() {
         // Load cmdjewel config file
         let dir = dir.join(constants::CONFIG_PATH);
         // If it exists, read it.
@@ -55,11 +55,56 @@ pub fn get_config() -> data::Config {
 
 /// Returns the full path of a config file
 pub fn config_path() -> Option<PathBuf> {
-    dirs::config_local_dir().map(|dir| dir.join(constants::CONFIG_PATH))
+    state_dir().map(|dir| dir.join(constants::CONFIG_PATH))
+}
+
+/// The folder that holds `cmdjewel/config.toml` (settings and saves):
+/// `$XDG_STATE_HOME` when it is set, else `~/.local/state` on Linux and the
+/// BSDs, else the OS config folder as before (macOS, Windows). A config.toml
+/// left in the old folder (`~/.config/cmdjewel`) is copied over the first time.
+/// Tests get no folder, so they never touch a real save.
+fn state_dir() -> Option<PathBuf> {
+    #[cfg(test)]
+    return None;
+    #[cfg(not(test))]
+    {
+        static DIR: std::sync::OnceLock<Option<PathBuf>> = std::sync::OnceLock::new();
+        DIR.get_or_init(|| {
+            let xdg = std::env::var_os("XDG_STATE_HOME")
+                .map(PathBuf::from)
+                .filter(|p| p.is_absolute());
+            #[cfg(all(unix, not(target_os = "macos")))]
+            let dir = xdg.or_else(dirs::state_dir);
+            #[cfg(not(all(unix, not(target_os = "macos"))))]
+            let dir = xdg.or_else(dirs::config_local_dir);
+            if let (Some(new), Some(old)) = (&dir, dirs::config_local_dir()) {
+                let (new, old) = (new.join(constants::CONFIG_PATH), old.join(constants::CONFIG_PATH));
+                if new != old && !new.exists() && old.exists() {
+                    if let Some(parent) = new.parent() {
+                        let _ = std::fs::create_dir_all(parent);
+                    }
+                    match std::fs::copy(&old, &new) {
+                        Ok(_) => log::info!("copied {} to {}", old.display(), new.display()),
+                        Err(e) => log::warn!("could not copy {}: {}", old.display(), e),
+                    }
+                }
+            }
+            log::info!("state folder: {:?}", dir.as_ref().map(|d| d.join("cmdjewel")));
+            dir
+        })
+        .clone()
+    }
 }
 
 /// Saves a board to an existing Save. Requires get_save() to return a valid save
 pub fn save_board(board: &Board, is_game_over: bool) {
+    log::info!(
+        "save {}: score {} level {} game over {}",
+        board.config_ref().name,
+        board.get_score(),
+        board.get_level() + 1,
+        is_game_over
+    );
     CONFIG_MODIFIED.store(true, std::sync::atomic::Ordering::Relaxed);
     // Load the config (or the default config)
     let mut cfg = get_config();
@@ -81,7 +126,7 @@ pub fn save_board(board: &Board, is_game_over: bool) {
 /// Writes a Config struct to a config file.
 /// If the write fails, no exception is thrown. (TODO: probably throw one?)
 pub fn save_config(cfg: &data::Config) {
-    if let Some(dir) = dirs::config_local_dir() {
+    if let Some(dir) = state_dir() {
         let dir = dir.join(constants::CONFIG_PATH);
         let mut doc = toml_edit::ser::to_document(cfg).unwrap();
         let mut visitor = hacks::HackyFormatter;
@@ -89,7 +134,7 @@ pub fn save_config(cfg: &data::Config) {
         {
             let mut folder = dir.clone();
             folder.pop();
-            std::fs::create_dir(folder).unwrap_or_default();
+            std::fs::create_dir_all(folder).unwrap_or_default();
         }
         visitor.visit_document_mut(&mut doc);
         std::fs::write(dir, doc.to_string()).unwrap();
@@ -98,7 +143,8 @@ pub fn save_config(cfg: &data::Config) {
 
 /// Deletes the config file, if it exists.
 pub fn reset_config() {
-    if let Some(dir) = dirs::config_local_dir() {
+    log::info!("settings reset: config file deleted");
+    if let Some(dir) = state_dir() {
         let dir = dir.join(constants::CONFIG_PATH);
         if dir.exists() {
             std::fs::remove_file(dir).unwrap();
